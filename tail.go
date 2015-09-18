@@ -53,6 +53,7 @@ func TailFile(filepath string, buffersize int64) (*Tail, error) {
 			t.Lines <- scanner.Text()
 		}
 
+		close(t.Lines)
 		t.wait <- true
 	}()
 
@@ -61,11 +62,12 @@ func TailFile(filepath string, buffersize int64) (*Tail, error) {
 
 func (t *Tail) Stop() {
 	t.cmd.Process.Signal(syscall.SIGINT)
-	timeout := time.After(time.Second)
+	timeout := time.After(2 * time.Second)
 	select {
 	case <-t.wait:
 	case <-timeout:
 		t.cmd.Process.Kill()
+		<-t.wait
 	}
 
 	close(t.wait)
