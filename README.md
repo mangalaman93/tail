@@ -1,4 +1,2 @@
 # tail
-The package is implemented using `tail` function. It simply reads the stdout of `tail` using `bufio.Scanner`.
-
-> The stdout pipe of the process has finite buffer. [Need more details here]
+The package is implemented using `tail` function provided by Linux. It simply reads the stdout of `tail` using `bufio.Scanner` and pass it to the application through a go channel.
