@@ -2,9 +2,8 @@ package tail
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
-	"io"
-	"log"
 	"os"
 	"os/exec"
 	"syscall"
@@ -18,6 +17,7 @@ const (
 type Tail struct {
 	Filename string      // name of file to tail
 	Lines    chan string // channel to read lines
+	Err      error       // stores the error occurred
 	cmd      *exec.Cmd   // command object
 	wait     chan bool   // channel signal to stop waiting
 }
@@ -51,6 +51,7 @@ func TailFile(filepath string, buffersize int) (*Tail, error) {
 		Lines:    make(chan string, QUEUE_SIZE),
 		cmd:      cmd,
 		wait:     make(chan bool, 1),
+		Err:      nil,
 	}
 
 	go func() {
@@ -62,11 +63,9 @@ func TailFile(filepath string, buffersize int) (*Tail, error) {
 		}
 
 		if isPrefix {
-			log.Println("buffer size is too small!")
-		}
-
-		if err != io.EOF {
-			log.Println(err)
+			t.Err = errors.New("buffer size is too small!")
+		} else {
+			t.Err = err
 		}
 
 		close(t.Lines)

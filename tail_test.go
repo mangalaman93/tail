@@ -74,6 +74,8 @@ func TestOne(t *testing.T) {
 		fmt.Printf("number of line matched: %d, total lines: %d\n", count, mycount)
 		t.FailNow()
 	}
+
+	fmt.Println(tail.Err)
 }
 
 func TestWaitBeforeRead(t *testing.T) {
@@ -106,6 +108,8 @@ func TestWaitBeforeRead(t *testing.T) {
 		fmt.Printf("number of line matched: %d, total lines: %d\n", count, mycount)
 		t.FailNow()
 	}
+
+	fmt.Println(tail.Err)
 }
 
 func TestLongLine(t *testing.T) {
@@ -138,4 +142,6 @@ func TestLongLine(t *testing.T) {
 		fmt.Printf("number of line matched: %d, total lines: %d\n", count, mycount)
 		t.FailNow()
 	}
+
+	fmt.Println(tail.Err)
 }
