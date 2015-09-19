@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"testing"
 	"time"
 )
@@ -68,9 +69,14 @@ func TestOne(t *testing.T) {
 			tail.Stop()
 		}
 	}
+
+	if count != mycount {
+		fmt.Printf("number of line matched: %d, total lines: %d\n", count, mycount)
+		t.FailNow()
+	}
 }
 
-func TestTwo(t *testing.T) {
+func TestWaitBeforeRead(t *testing.T) {
 	myline := "This is a simple line"
 	var mycount int64 = 10000000
 	setup(t, mycount, myline)
@@ -94,5 +100,42 @@ func TestTwo(t *testing.T) {
 		if count == mycount {
 			tail.Stop()
 		}
+	}
+
+	if count != mycount {
+		fmt.Printf("number of line matched: %d, total lines: %d\n", count, mycount)
+		t.FailNow()
+	}
+}
+
+func TestLongLine(t *testing.T) {
+	myline := strings.Repeat("This is an extraordinarily long but simple line", 10000)
+	var mycount int64 = 10000
+	setup(t, mycount, myline)
+	defer tear(t)
+
+	tail, err := TailFile(path.Join(TESTDIR, FILE), 500000)
+	check("unable to tail file!", err, t)
+	fmt.Println(tail)
+	fmt.Println("waiting for 10 seconds...")
+	time.Sleep(10 * time.Second)
+	fmt.Println("done waiting!")
+
+	var count int64 = 0
+	for line := range tail.Lines {
+		count++
+		if line != myline {
+			tail.Stop()
+			t.Fatal("line does not match!")
+		}
+
+		if count == mycount {
+			tail.Stop()
+		}
+	}
+
+	if count != mycount {
+		fmt.Printf("number of line matched: %d, total lines: %d\n", count, mycount)
+		t.FailNow()
 	}
 }
