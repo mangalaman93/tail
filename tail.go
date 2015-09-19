@@ -16,15 +16,14 @@ const (
 )
 
 type Tail struct {
-	Filename   string
-	BufferSize int
-	Lines      chan string
-	cmd        *exec.Cmd
-	wait       chan bool
+	Filename string
+	Lines    chan string
+	cmd      *exec.Cmd
+	wait     chan bool
 }
 
-func (t *Tail) string() string {
-	return fmt.Sprintf("&Tail{Filename:%s, BufferSize:%d}", t.Filename, t.BufferSize)
+func (t *Tail) String() string {
+	return fmt.Sprintf("&Tail{Filename:%s}", t.Filename)
 }
 
 func TailFile(filepath string, buffersize int) (*Tail, error) {
@@ -46,11 +45,10 @@ func TailFile(filepath string, buffersize int) (*Tail, error) {
 	}
 
 	t := &Tail{
-		Filename:   filepath,
-		BufferSize: buffersize,
-		Lines:      make(chan string, QUEUE_SIZE),
-		cmd:        cmd,
-		wait:       make(chan bool, 1),
+		Filename: filepath,
+		Lines:    make(chan string, QUEUE_SIZE),
+		cmd:      cmd,
+		wait:     make(chan bool, 1),
 	}
 
 	go func() {
